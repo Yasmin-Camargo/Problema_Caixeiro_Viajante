@@ -29,10 +29,11 @@ int main(int argc, char const *argv[]) {
 }
 
 void carregamatrizAdjacencia(char nomeArquivo[], int numVertices, int matrizAdjacencia[numVertices][numVertices]) {
-    // Abre o arquivo em modo de leitura
     FILE *arquivo = NULL;
     arquivo = fopen(nomeArquivo, "r");
     
+    printf("%d\n\n", numVertices);
+
     // Verifica se o arquivo foi aberto corretamente
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
@@ -53,27 +54,20 @@ void carregamatrizAdjacencia(char nomeArquivo[], int numVertices, int matrizAdja
         }
     }
 
-    printf("%d", numVertices);
-
-    // Fecha o arquivo
     fclose(arquivo);
 }
 
 // Conta quantos vértices existem na matriz de adjacência
 int contVertices(char nomeArquivo[]) { 
     FILE *arquivo = NULL;
-    int numVertices = 1;
+    int numVertices = 0;
 
-    // Abre o arquivo em modo de leitura
+    // Abre o arquivo e conta o número de linhas
     arquivo = fopen(nomeArquivo, "r");
-    char temp;
-    while ((temp = fgetc(arquivo)) != '\n') {
-        if (temp == ' ') {
-            numVertices++;
-             while ((temp = fgetc(arquivo)) == ' '){
-                //Lê próximos espacos e não contabiliza
-             }
-        }
+    char temp[10000];
+    while (fgets (temp, 10000, arquivo) != NULL) {
+        numVertices++;  
     }
+    fclose(arquivo);
     return numVertices;
 }
