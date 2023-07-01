@@ -1,7 +1,11 @@
+// Desenvolvido por: Caroline Souza Camargo e Yasmin Souza Camargo
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <time.h>
 
+// Escopo das funções
 void carregaMatrizAdjacencia(char nomeArquivo[], int numVertices, int matriz[numVertices][numVertices]);
 int contVertices(char nomeArquivo[]);
 void caixeiroViajanteExato(int numVertices, int matriz[numVertices][numVertices]);
@@ -9,23 +13,24 @@ void todasCombinacoes(int numVertices, int matriz[numVertices][numVertices], int
 void trocaPosicaoElementos(int * elemento1, int * elemento2);
 int calculaCusto(int numVertices, int todosVertices[numVertices], int matriz[numVertices][numVertices]);
 
-int rotaMinima = 9999999;
+int rotaMinima = INT_MAX;  // Valor máximo de int
 
 int main() {
-    char nomeArquivo[] = "tsp1_253.txt";
-    int numVertices = contVertices(nomeArquivo);
-    int matrizAdjacencia[numVertices][numVertices];
+    char nomeArquivo[] = "../arquivos_teste/tsp1_253.txt";           // Caminho para o arquivo com os dados da matriz de adjacência de um grafo
+    int numVertices = contVertices(nomeArquivo);    // Chama função para contar os número de vértices do grafo
+    int matrizAdjacencia[numVertices][numVertices]; 
 
-    clock_t inicio = clock();  // Tempo inicial
-    carregaMatrizAdjacencia(nomeArquivo, numVertices, matrizAdjacencia);
+    clock_t inicio = clock();                               // Tempo inicial
+    carregaMatrizAdjacencia(nomeArquivo, numVertices, matrizAdjacencia);    // Chama função para criar a matriz
     
-    caixeiroViajanteExato(numVertices, matrizAdjacencia);
+    caixeiroViajanteExato(numVertices, matrizAdjacencia);   // Função que encontra o menor caminho possível que visite todos vértices exatamente uma vez e retorne a origem
     
-    clock_t fim = clock();  // Tempo final
+    clock_t fim = clock();          // Tempo final
     double tempoGasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
     printf("Tempo: %f s  (%f min)\n", tempoGasto, tempoGasto / 60);
 
-    /*
+    /* 
+    // Mostra matriz para o usuário
     for (int i = 0; i < numVertices; i++) {
         for (int j = 0; j < numVertices; j++) {
             printf("\t%d ", matrizAdjacencia[i][j]);
@@ -36,9 +41,12 @@ int main() {
     return 0;
 }
 
+//  Funções para o Grafo:
+// ------------------------------------------------------------------------------------------------------
+
 void carregaMatrizAdjacencia(char nomeArquivo[], int numVertices, int matrizAdjacencia[numVertices][numVertices]) {
     FILE *arquivo = NULL;
-    arquivo = fopen(nomeArquivo, "r");
+    arquivo = fopen(nomeArquivo, "r");      // Abertura do arquivo
     
     printf("\nNumero de vertices: %d", numVertices);
     printf("\nNumero de arestas: %d \n\n",  (numVertices * numVertices) - numVertices);
@@ -49,21 +57,21 @@ void carregaMatrizAdjacencia(char nomeArquivo[], int numVertices, int matrizAdja
         printf("\nErro ao abrir o arquivo.\n");
         return;
     }
-
+    
+    // Percorre arquivo colocando dados na matriz
     for (int i = 0; i < numVertices; i++) {
         for (int j = 0; j < numVertices; j++) {
             char c;
             do {
-                c = fgetc(arquivo); //Ignora os espaços
+                c = fgetc(arquivo);         // Ignora os espaços
             } while (c == ' ');
 
-            if (c != ' ' && c != '\n') {
-                ungetc(c, arquivo); //Devolve o último caractere
+            if (c != ' ' && c != '\n') {    // Se não é um espaço em branco e não é uma quebra de linha:
+                ungetc(c, arquivo);         // devolve o último caractere (permite que ele seja lido novamente)
             }
-            fscanf(arquivo, "%d", &matrizAdjacencia[i][j]);
+            fscanf(arquivo, "%d", &matrizAdjacencia[i][j]); // Lê um valor inteiro do arquivo e armazena na matriz
         }
     }
-
     fclose(arquivo);
 }
 
@@ -82,57 +90,60 @@ int contVertices(char nomeArquivo[]) {
     return numVertices;
 }
 
+//  Funções para o problema do Caixeiro Viajante:
+// ------------------------------------------------------------------------------------------------------
+
 void caixeiroViajanteExato(int numVertices, int matriz[numVertices][numVertices]){
     int todosVertices[numVertices];
 
-    // coloca todos vértices no vetor de vértices
+    // Coloca todos vértices no vetor de vértices
     for (int i=0; i < numVertices; i++){
         todosVertices[i] = i;
     }
 
     todasCombinacoes(numVertices, matriz, todosVertices, 0);
-
     printf("Custo Otimo = %d\n\n", rotaMinima);
 }
 
 
-// Função para gerar todas combinações do vetor vértices
+// Função recursiva para gerar todas combinações possíveis do vetor vértices
 void todasCombinacoes(int numVertices, int matriz[numVertices][numVertices], int todosVertices[numVertices], int verticeInicial){
     if (verticeInicial == numVertices - 1){
-        
         /*
+        // Mostra para o usuário todas as combinações testadas pelo algoritmo
         for (int i = 0; i < numVertices; i++) {
             printf("%d ", todosVertices[i]);
         }
         printf("\n"); */
 
-        int custoCaminhoAtual = calculaCusto(numVertices, todosVertices, matriz);
-        if (custoCaminhoAtual < rotaMinima){
+        int custoCaminhoAtual = calculaCusto(numVertices, todosVertices, matriz);   // Chama função para calcular a distância da rota que foi gerada
+        if (custoCaminhoAtual < rotaMinima){    // Verifica se a distância atual não foi menor que a distância total
             rotaMinima = custoCaminhoAtual;
-        }
-        
-    } else{
-        for (int i = verticeInicial; i < numVertices; i++){
+        }     
+    } 
+    else {
+        for (int i = verticeInicial; i < numVertices; i++){ // Troca elementos para ter todas combinações possíveis
             trocaPosicaoElementos(&todosVertices[i], &todosVertices[verticeInicial]);
-            todasCombinacoes(numVertices, matriz, todosVertices, verticeInicial + 1);
+            todasCombinacoes(numVertices, matriz, todosVertices, verticeInicial + 1);   // Recursão
             trocaPosicaoElementos(&todosVertices[i], &todosVertices[verticeInicial]);
         }
     }
 }
 
-void trocaPosicaoElementos(int * elemento1, int * elemento2){
+// Função auxiliar para trocar elementos (swap)
+void trocaPosicaoElementos(int * elemento1, int * elemento2){   
     int temp = *elemento1;
     *elemento1 = *elemento2;
     *elemento2 = temp;
 }
 
+// Calcula o custo do caminho passando pelos vértices dados
 int calculaCusto(int numVertices, int todosVertices[numVertices], int matriz[numVertices][numVertices]){
     int custoCaminho = 0;
     for (int i = 0; i < numVertices - 1 ; i++){
         custoCaminho = custoCaminho + matriz[todosVertices[i]][todosVertices[i + 1]];
     }
-    custoCaminho = custoCaminho + matriz[todosVertices[0]][todosVertices[numVertices - 1]];
-
+    custoCaminho = custoCaminho + matriz[todosVertices[0]][todosVertices[numVertices - 1]]; // custo para voltar para o vértica inicial
     //printf("-> %d\n", custoCaminho);
     
     return custoCaminho;
