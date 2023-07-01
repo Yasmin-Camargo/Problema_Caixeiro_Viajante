@@ -12,18 +12,18 @@ int calculaCusto(int numVertices, int todosVertices[numVertices], int matriz[num
 int rotaMinima = 9999999;
 
 int main() {
-    char nomeArquivo[] = "tsp2_1248.txt";
+    char nomeArquivo[] = "tsp1_253.txt";
     int numVertices = contVertices(nomeArquivo);
     int matrizAdjacencia[numVertices][numVertices];
 
     clock_t inicio = clock();  // Tempo inicial
     carregaMatrizAdjacencia(nomeArquivo, numVertices, matrizAdjacencia);
     
-    //Inserir código aqui
+    caixeiroViajanteExato(numVertices, matrizAdjacencia);
     
     clock_t fim = clock();  // Tempo final
     double tempoGasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
-    printf("Tempo: %f s\n", tempoGasto * 1000);
+    printf("Tempo: %f s  (%f min)\n", tempoGasto, tempoGasto / 60);
 
     /*
     for (int i = 0; i < numVertices; i++) {
@@ -32,8 +32,6 @@ int main() {
         }
         printf("\n");
     }*/
-
-    caixeiroViajanteExato(numVertices, matrizAdjacencia);
 
     return 0;
 }
