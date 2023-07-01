@@ -17,6 +17,7 @@ int vetorCustoMinimo[100];
 
 int main() {
     char nomeArquivo[] = "../arquivos_teste/tsp1_253.txt"; // Caminho para o arquivo com os dados da matriz de adjacência de um grafo
+    printf("\n\n\n--- Arquivo: %s ---\n", nomeArquivo);
     int numVertices = contVertices(nomeArquivo); // Chama função para contar os número de vértices do grafo
     int matrizAdjacencia[numVertices][numVertices]; 
 
