@@ -77,3 +77,4 @@ hs_err_pid*
 replay_pid*
 
 .vscode/
+/algoritmo_aproximativo/dist/

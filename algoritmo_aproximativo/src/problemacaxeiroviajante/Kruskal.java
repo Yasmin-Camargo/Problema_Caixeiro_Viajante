@@ -11,9 +11,11 @@ public class Kruskal {
     private Grafo grafo;
     private int [][]tabelaDeControleKruskal;
     private static final int MAX = 2147483647;
+    private int quantArestasFinal;
     
     public Kruskal(Grafo grafo){
         this.grafo = grafo;
+        quantArestasFinal = 0;
     }
     
     public boolean kruskal(){
@@ -74,6 +76,7 @@ public class Kruskal {
                 }
                 System.out.println(grupoNumeros); 
                 tabelaDeControleKruskal[i][2] = 1;      // ativa o caminho
+                quantArestasFinal++;
             }
         }
 
@@ -112,13 +115,12 @@ public class Kruskal {
         return false;
     }
     
-    private boolean possuiElemento(int []areaSegura, int tam, int valor){
-        for (int i = 0; i < tam; i++){
-            if (valor == areaSegura[i]){
-                return true;
-            }
-        }
-        return false;
+    public int[][] getMatrizFinalKruskal(){
+        return tabelaDeControleKruskal;
+    }
+    
+    public int getQuantArestasFinal(){
+        return quantArestasFinal;
     }
     
     private void mostraKruskal(){  //[0]origem [1]destino [2]flag Vértice Seguro

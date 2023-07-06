@@ -20,9 +20,10 @@ public class ProblemaCaxeiroViajante {
      */
     public static void main(String[] args) throws IOException  {
         int op;
-        String caminho_arquivo = "..\\ProblemaCacheiroViajante\\src\\problemacaxeiroviajante\\tsp5_27603.txt"; 
+        ProblemaCaxeiroViajante problemaCaxeiroViajante = new ProblemaCaxeiroViajante();
+        String caminho_arquivo = "..\\algoritmo_aproximativo\\src\\problemacaxeiroviajante\\tsp2_1248.txt"; 
         
-        Grafo grafo = carregaMatrizDeAdjacencia(caminho_arquivo);
+        Grafo grafo = problemaCaxeiroViajante.carregaMatrizDeAdjacencia(caminho_arquivo);
         
         do {                
             op = menu();
@@ -32,8 +33,16 @@ public class ProblemaCaxeiroViajante {
                     break;
                     
                 case 1: //Encontra o menor caminho
-                    Kruskal funcaoKruskal = new Kruskal(grafo);
-                    funcaoKruskal.kruskal();
+                    //ETAPA 1
+                    Kruskal kruskal = new Kruskal(grafo);
+                    kruskal.kruskal();
+                    
+                    //ETAPA 2
+                    int [][]matrizFinalKruskal = kruskal.getMatrizFinalKruskal();
+                    
+                    
+                    System.out.println("-> " + matrizFinalKruskal.length);
+                    problemaCaxeiroViajante.duplicaArestas(matrizFinalKruskal, kruskal.getQuantArestasFinal());
                     break;
                     
                 case 2: //Print da matriz
@@ -52,7 +61,7 @@ public class ProblemaCaxeiroViajante {
         Scanner entrada = new Scanner(System.in);
         int opMenu;
         System.out.println("\n\n\t===== Implementacao de Grafos =====");
-        System.out.println("\t 1) Executar código");
+        System.out.println("\t 1) Executar codigo");
         System.out.println("\t 2) Mostrar matriz de Adjacencia");
         System.out.println("\t 0) sair");
         opMenu = entrada.nextInt();
@@ -62,7 +71,7 @@ public class ProblemaCaxeiroViajante {
         return -1;
     }
     
-    public static Grafo carregaMatrizDeAdjacencia(String caminho_arquivo) throws IOException{
+    public Grafo carregaMatrizDeAdjacencia(String caminho_arquivo) throws IOException{
         // Abre o arquivo
         BufferedReader arquivo = null;
         try {
@@ -101,5 +110,28 @@ public class ProblemaCaxeiroViajante {
         //System.out.println(grafo);
         
         return grafo;
+    }
+    
+    public void duplicaArestas(int matriz[][], int tamanho){
+        int matrizDuplicada[][] = new int[tamanho * 2][2];
+        int indiceDuplicada = -1;
+        
+        for (int i = 0; i < matriz.length; i++) {
+            System.out.println(" " + matriz[i][0] + " ." + matriz[i][1] + " ." + matriz[i][2]);
+            if (matriz[i][2] == 1) {
+                indiceDuplicada++;
+                matrizDuplicada[indiceDuplicada][0] = matriz[i][0];
+                matrizDuplicada[indiceDuplicada][1] = matriz[i][1];
+                indiceDuplicada++;
+                matrizDuplicada[indiceDuplicada][0] = matriz[i][0];
+                matrizDuplicada[indiceDuplicada][1] = matriz[i][1];
+            }
+        }
+        
+        System.out.println("----");
+        for (int i = 0; i < matrizDuplicada.length; i++) {
+            System.out.println("a: " + (matrizDuplicada[i][0] + 1) + "  b: " + (matrizDuplicada[i][1]+1));
+            System.out.println("");
+        }
     }
 }
