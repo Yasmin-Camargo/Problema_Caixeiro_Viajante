@@ -147,6 +147,6 @@ public class Kruskal {
                 System.out.println("(" +vertA+ "," +vertB+ ") \t" +grafo.getMatrizAdjacencia()[vertA][vertB]);
             }
         }
-        System.out.println("\nCuto minimo para passar em todas arestas:  " + custo);
+        System.out.println("\nCuto minimo para passar em todas arestas (Kruskal):  " + custo);
     }
 }

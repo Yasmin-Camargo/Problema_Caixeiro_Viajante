@@ -20,7 +20,9 @@ public class ProblemaCaixeiroViajante {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException  {
+        long tempoInicial = System.currentTimeMillis();
         int op;
+        
         ProblemaCaixeiroViajante problemaCaixeiroViajante = new ProblemaCaixeiroViajante();
         String caminho_arquivo = "..\\arquivos_teste\\tsp1_253.txt"; 
         
@@ -53,7 +55,6 @@ public class ProblemaCaixeiroViajante {
                     //ETAPA 4
                     //Construir um circuito hamiltoniano, com os vértices na ordem do ciclo euleriano, sem repetições
                     problemaCaixeiroViajante.encontraCircuitoHamiltoniano(caminhoEuleriano, grafo.getMatrizAdjacencia());
-                    System.exit(0);
                     break;
                     
                 case 2: //Print da matriz
@@ -65,7 +66,10 @@ public class ProblemaCaixeiroViajante {
                     System.out.println("\n\n DIGITE UM NUMERO VALIDO!!!\n");
                     break;
             }
-        } while (op != 0);
+        } while (op != 1);
+        
+        long tempoFinal = System.currentTimeMillis();
+        System.out.printf("\nTempo: %.3f ms\n", (tempoFinal - tempoInicial) / 1000d);
     }
     
     public static int menu(){
@@ -94,8 +98,8 @@ public class ProblemaCaixeiroViajante {
         
         //Faz leitura da primeira linha para saber o número de vértices
         String linha = arquivo.readLine();
-        String[] textoSeparado = linha.split("\\p{Zs}+"); //Separa o conteúdo da linha (indepedente do tamanho do espaço) 
-        
+        String[] textoSeparado = linha.split("\\s+"); //Separa o conteúdo da linha (indepedente do tamanho do espaço) 
+    
         //Incializa o grafo de acordo com a quantidade de elementos encontrados na primeira linha
         Grafo grafo = new Grafo(textoSeparado.length);
         grafo.setArestas(grafo.getVertices() * grafo.getVertices() - grafo.getVertices());
@@ -112,7 +116,7 @@ public class ProblemaCaixeiroViajante {
             }
             linha = arquivo.readLine();
             if (linha != null) {
-                textoSeparado = linha.split("\\p{Zs}+");
+                textoSeparado = linha.split("\\s+");
             }
         }
         
@@ -138,24 +142,27 @@ public class ProblemaCaixeiroViajante {
         return matrizDuplicada;
     }
     
-    public void encontraCircuitoHamiltoniano(ArrayList<Integer> caminhoEuleriano, int matrizAdjacencia[][]){
+    public void encontraCircuitoHamiltoniano(ArrayList<Integer> caminhoEuleriano, int matrizAdjacencia[][]){ //Encontra circuito haltominiano tirando os vértices repetidos do caminho euleriano
         ArrayList<Integer> circuitoHamiltoniano = new ArrayList();
         int custoTotal = 0, cont = 0;
-        
+      
         circuitoHamiltoniano.add(caminhoEuleriano.get(0)); //primeiro veritice
         for (int i = 0; i < caminhoEuleriano.size(); i++) {
             if (verificaVisita(caminhoEuleriano.get(i), circuitoHamiltoniano)) {
                 circuitoHamiltoniano.add(caminhoEuleriano.get(i));
-                if ((cont + 1) < circuitoHamiltoniano.size()) {
-                    custoTotal += matrizAdjacencia[circuitoHamiltoniano.get(cont)][caminhoEuleriano.get(cont+1)];
+                if ((cont+1) < circuitoHamiltoniano.size()) {
+                    custoTotal += matrizAdjacencia[circuitoHamiltoniano.get(cont)][circuitoHamiltoniano.get(cont+1)];
                 }
                 cont++;
             }
         }
-        circuitoHamiltoniano.add(caminhoEuleriano.get(0));
-        custoTotal += matrizAdjacencia[caminhoEuleriano.get(cont)][caminhoEuleriano.get(cont+1)];
+
+        circuitoHamiltoniano.add(circuitoHamiltoniano.get(0));
+        custoTotal += matrizAdjacencia[circuitoHamiltoniano.get(cont)][circuitoHamiltoniano.get(cont+1)];
         System.out.println("\n\nCIRCUITO HAMILTONIANO: " + circuitoHamiltoniano);
         System.out.println("\nCUSTO TOTAL CAIXEIRO VIAJANTE: " + custoTotal);
+        
+        
     }
     
     private boolean verificaVisita(int vertice, ArrayList<Integer> circuitoHamiltoniano){ //Verifica se o vertice já foi percorrido 
