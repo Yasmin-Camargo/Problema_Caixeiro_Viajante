@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package problemacaxeiroviajante;
+package problemacaixeiroviajante;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -14,35 +15,45 @@ import java.util.Scanner;
  * 
  */
 
-public class ProblemaCaxeiroViajante {
+public class ProblemaCaixeiroViajante {
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException  {
         int op;
-        ProblemaCaxeiroViajante problemaCaxeiroViajante = new ProblemaCaxeiroViajante();
-        String caminho_arquivo = "..\\algoritmo_aproximativo\\src\\problemacaxeiroviajante\\tsp2_1248.txt"; 
+        ProblemaCaixeiroViajante problemaCaixeiroViajante = new ProblemaCaixeiroViajante();
+        String caminho_arquivo = "..\\arquivos_teste\\tsp1_253.txt"; 
         
-        Grafo grafo = problemaCaxeiroViajante.carregaMatrizDeAdjacencia(caminho_arquivo);
-        
-        do {                
-            op = menu();
+        Grafo grafo = problemaCaixeiroViajante.carregaMatrizDeAdjacencia(caminho_arquivo);
+        System.out.println(grafo);
+        do {   
+            op = 1;
+            //op = menu();
             switch (op) {
                 case 0: //Encerra programa
                     System.out.println("\n\n Saindo ...\n");
                     break;
                     
-                case 1: //Encontra o menor caminho
+                case 1: //Encontra o menor caminho, Algoritmo Aproximativo utilizado:  RSL(Rosenkrantz, Stearns e Lewis )
                     //ETAPA 1
+                    //Gera um subconjunto de arestas que forma uma árvore que inclui todos os vértices onde o peso total é minimo (Kruskal)
                     Kruskal kruskal = new Kruskal(grafo);
-                    kruskal.kruskal();
+                    Grafo arvoreGeradoraMinima = kruskal.kruskal();
+                    //System.out.println("\n" + arvoreGeradoraMinima);
                     
                     //ETAPA 2
-                    int [][]matrizFinalKruskal = kruskal.getMatrizFinalKruskal();
+                    //Pega ávore geradora minima e duplica as arestas
+                    int [][]matrizDuplicada = problemaCaixeiroViajante.duplicaArestas((kruskal.getMatrizFinalKruskal()), kruskal.getQuantArestasFinal());
                     
+                    //ETAPA 3
+                    //Encontrar um ciclo euleriano (caminho em um grafo que visita toda aresta exatamente uma vez)
+                    CicloEuleriano cicloEuleriano = new CicloEuleriano(matrizDuplicada, arvoreGeradoraMinima);
+                    ArrayList<Integer> caminhoEuleriano = cicloEuleriano.encontraCicloEuleriano();
                     
-                    System.out.println("-> " + matrizFinalKruskal.length);
-                    problemaCaxeiroViajante.duplicaArestas(matrizFinalKruskal, kruskal.getQuantArestasFinal());
+                    //ETAPA 4
+                    //Construir um circuito hamiltoniano, com os vértices na ordem do ciclo euleriano, sem repetições
+                    problemaCaixeiroViajante.encontraCircuitoHamiltoniano(caminhoEuleriano, grafo.getMatrizAdjacencia());
+                    System.exit(0);
                     break;
                     
                 case 2: //Print da matriz
@@ -106,32 +117,53 @@ public class ProblemaCaxeiroViajante {
         }
         
         //Adiciona matriz de adjacencia no grafo
-        grafo.addMatrizAdjacencia(matriz);
-        //System.out.println(grafo);
-        
+        grafo.addMatrizAdjacencia(matriz);        
         return grafo;
     }
     
-    public void duplicaArestas(int matriz[][], int tamanho){
-        int matrizDuplicada[][] = new int[tamanho * 2][2];
+    public int[][] duplicaArestas(int matriz[][], int tamanho){
+        int matrizDuplicada[][] = new int[tamanho * 2][3];
         int indiceDuplicada = -1;
         
         for (int i = 0; i < matriz.length; i++) {
-            System.out.println(" " + matriz[i][0] + " ." + matriz[i][1] + " ." + matriz[i][2]);
             if (matriz[i][2] == 1) {
                 indiceDuplicada++;
                 matrizDuplicada[indiceDuplicada][0] = matriz[i][0];
                 matrizDuplicada[indiceDuplicada][1] = matriz[i][1];
                 indiceDuplicada++;
-                matrizDuplicada[indiceDuplicada][0] = matriz[i][0];
-                matrizDuplicada[indiceDuplicada][1] = matriz[i][1];
+                matrizDuplicada[indiceDuplicada][0] = matriz[i][1];
+                matrizDuplicada[indiceDuplicada][1] = matriz[i][0];
             }
         }
+        return matrizDuplicada;
+    }
+    
+    public void encontraCircuitoHamiltoniano(ArrayList<Integer> caminhoEuleriano, int matrizAdjacencia[][]){
+        ArrayList<Integer> circuitoHamiltoniano = new ArrayList();
+        int custoTotal = 0, cont = 0;
         
-        System.out.println("----");
-        for (int i = 0; i < matrizDuplicada.length; i++) {
-            System.out.println("a: " + (matrizDuplicada[i][0] + 1) + "  b: " + (matrizDuplicada[i][1]+1));
-            System.out.println("");
+        circuitoHamiltoniano.add(caminhoEuleriano.get(0)); //primeiro veritice
+        for (int i = 0; i < caminhoEuleriano.size(); i++) {
+            if (verificaVisita(caminhoEuleriano.get(i), circuitoHamiltoniano)) {
+                circuitoHamiltoniano.add(caminhoEuleriano.get(i));
+                if ((cont + 1) < circuitoHamiltoniano.size()) {
+                    custoTotal += matrizAdjacencia[circuitoHamiltoniano.get(cont)][caminhoEuleriano.get(cont+1)];
+                }
+                cont++;
+            }
         }
+        circuitoHamiltoniano.add(caminhoEuleriano.get(0));
+        custoTotal += matrizAdjacencia[caminhoEuleriano.get(cont)][caminhoEuleriano.get(cont+1)];
+        System.out.println("\n\nCIRCUITO HAMILTONIANO: " + circuitoHamiltoniano);
+        System.out.println("\nCUSTO TOTAL CAIXEIRO VIAJANTE: " + custoTotal);
+    }
+    
+    private boolean verificaVisita(int vertice, ArrayList<Integer> circuitoHamiltoniano){ //Verifica se o vertice já foi percorrido 
+        for (int i = 0; i < circuitoHamiltoniano.size(); i++) {
+            if (circuitoHamiltoniano.get(i) == vertice) { 
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-package problemacaxeiroviajante;
+package problemacaixeiroviajante;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -9,16 +9,18 @@ import java.util.TreeSet;
 
 public class Kruskal {
     private Grafo grafo;
+    private Grafo arvoreGeradoraMinima;
     private int [][]tabelaDeControleKruskal;
     private static final int MAX = 2147483647;
     private int quantArestasFinal;
+    
     
     public Kruskal(Grafo grafo){
         this.grafo = grafo;
         quantArestasFinal = 0;
     }
     
-    public boolean kruskal(){
+    public Grafo kruskal(){
         tabelaDeControleKruskal = new int[grafo.getArestas()][3];
         
         //Inicializa tabela de controle 
@@ -74,14 +76,15 @@ public class Kruskal {
                     grupoNumeros.get(indiceVertB).addAll(grupoNumeros.get(indiceVertA));    // união dos dois conjuntos
                     grupoNumeros.get(indiceVertA).removeAll(grupoNumeros.get(indiceVertA)); // exclui conjunto anterior
                 }
-                System.out.println(grupoNumeros); 
+                //System.out.println(grupoNumeros); 
                 tabelaDeControleKruskal[i][2] = 1;      // ativa o caminho
                 quantArestasFinal++;
             }
         }
-
+        
+        criaArvoreGeradoraMinima();
         mostraKruskal();
-        return true;
+        return arvoreGeradoraMinima;
     }
     
     
@@ -115,6 +118,16 @@ public class Kruskal {
         return false;
     }
     
+    private void criaArvoreGeradoraMinima(){
+        arvoreGeradoraMinima = new Grafo(grafo.getVertices());
+        for (int i = 0; i < tabelaDeControleKruskal.length; i++) {
+            if (tabelaDeControleKruskal[i][2] == 1) {
+                int vertA = tabelaDeControleKruskal[i][0], vertB = tabelaDeControleKruskal[i][1];
+                arvoreGeradoraMinima.addAresta(vertA, vertB, grafo.getMatrizAdjacencia()[vertA][vertB]);
+            }
+        }
+    }
+    
     public int[][] getMatrizFinalKruskal(){
         return tabelaDeControleKruskal;
     }
@@ -124,16 +137,16 @@ public class Kruskal {
     }
     
     private void mostraKruskal(){  //[0]origem [1]destino [2]flag Vértice Seguro
-        int custo =0;
+        int custo = 0;
         System.out.println("\n--- Arvore Geradora Minima resultante ---");
         System.out.println("\nAresta \tPeso");
         for (int i = 0; i < grafo.getArestas(); i++) {
             if (tabelaDeControleKruskal[i][2] == 1) {
-                int vertA = tabelaDeControleKruskal[i][0] + 1, vertB = tabelaDeControleKruskal[i][1] + 1;
-                custo = custo + grafo.getMatrizAdjacencia()[vertA-1][vertB-1];
-                System.out.println("(" +vertA+ "," +vertB+ ") \t" +grafo.getMatrizAdjacencia()[vertA-1][vertB-1]);
+                int vertA = tabelaDeControleKruskal[i][0], vertB = tabelaDeControleKruskal[i][1];
+                custo = custo + grafo.getMatrizAdjacencia()[vertA][vertB];
+                System.out.println("(" +vertA+ "," +vertB+ ") \t" +grafo.getMatrizAdjacencia()[vertA][vertB]);
             }
         }
-        System.out.println("\nCuto minimo para passar em todas arestas:" + custo);
+        System.out.println("\nCuto minimo para passar em todas arestas:  " + custo);
     }
 }
