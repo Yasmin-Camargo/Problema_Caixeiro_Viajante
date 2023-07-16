@@ -13,7 +13,7 @@ O algoritmo consiste em realizar uma busca exaustiva por todas combinações pos
 
 ### --- Arquivo: tsp2_1248.txt ---
 - Custo Ótimo = 1248
-- Tempo: 0.000038 s  (0.000001 min)
+- Tempo: 0.038 ms  (0.000001 min)
 - Vértices para encontrar a rota mínima: [0, 1, 2, 3, 4, 0]
 
 
@@ -63,5 +63,5 @@ OBS.: Para gerar a árvore geradora de custo mínimo utilizou-se o algoritmo de 
 
 ### --- Arquivo: tsp5_27603.txt ---
 - Custo Ótimo = 35019
-- Tempo: 0,151 s
+- Tempo: 0,151 ms
 - Vértices para encontrar a rota mínima: [0, 1, 5, 4, 3, 6, 2, 8, 7, 11, 9, 10, 12, 13, 16, 17, 18, 14, 21, 22, 20, 28, 27, 25, 19, 15, 24, 26, 23, 0]
