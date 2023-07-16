@@ -24,7 +24,7 @@ public class ProblemaCaixeiroViajante {
         int op;
         
         ProblemaCaixeiroViajante problemaCaixeiroViajante = new ProblemaCaixeiroViajante();
-        String caminho_arquivo = "..\\arquivos_teste\\tsp1_253.txt"; 
+        String caminho_arquivo = "..\\arquivos_teste\\tsp4_7013.txt"; 
         
         Grafo grafo = problemaCaixeiroViajante.carregaMatrizDeAdjacencia(caminho_arquivo);
         System.out.println(grafo);
